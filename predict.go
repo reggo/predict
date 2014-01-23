@@ -20,7 +20,7 @@ type Predictor interface {
 
 // TODO: Replace these errors with a better location for error checking
 
-func BatchPredict(batch BatchPredictor, inputs common.RowMatrix, outputs common.MutableRowMatrix, inputDim, outputDim int, grainSize int) (mat64.Mutable, error) {
+func BatchPredict(batch BatchPredictor, inputs common.RowMatrix, outputs common.MutableRowMatrix, inputDim, outputDim int, grainSize int) (common.MutableRowMatrix, error) {
 
 	// TODO: Add in something about error
 
