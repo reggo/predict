@@ -20,7 +20,7 @@ type Predictor interface {
 
 // TODO: Replace these errors with a better location for error checking
 
-func BatchPredict(batch BatchPredictor, inputs mat64.Matrix, outputs mat64.Mutable, inputDim, outputDim int, grainSize int) (mat64.Mutable, error) {
+func BatchPredict(batch BatchPredictor, inputs common.RowMatrix, outputs common.MutableRowMatrix, inputDim, outputDim int, grainSize int) (mat64.Mutable, error) {
 
 	// TODO: Add in something about error
 
@@ -68,13 +68,9 @@ func BatchPredict(batch BatchPredictor, inputs mat64.Matrix, outputs mat64.Mutab
 			p := batch.NewPredictor()
 			output := make([]float64, outputDim)
 			for i := start; i < end; i++ {
-				for j := range output {
-					output[j] = outputs.At(i, j)
-				}
+				outputs.Row(output, i)
 				p.Predict(inputRVer.RowView(i), output)
-				for j, out := range output {
-					outputs.Set(i, j, out)
-				}
+				outputs.SetRow(i, output)
 			}
 		}
 	case !inputIsRowViewer && outputIsRowViewer:
@@ -82,9 +78,7 @@ func BatchPredict(batch BatchPredictor, inputs mat64.Matrix, outputs mat64.Mutab
 			p := batch.NewPredictor()
 			input := make([]float64, inputDim)
 			for i := start; i < end; i++ {
-				for j := range input {
-					input[j] = inputs.At(i, j)
-				}
+				inputs.Row(input, i)
 				p.Predict(input, outputRVer.RowView(i))
 			}
 		}
@@ -94,16 +88,10 @@ func BatchPredict(batch BatchPredictor, inputs mat64.Matrix, outputs mat64.Mutab
 			input := make([]float64, inputDim)
 			output := make([]float64, outputDim)
 			for i := start; i < end; i++ {
-				for j := range input {
-					input[j] = inputs.At(i, j)
-				}
-				for j := range output {
-					output[j] = outputs.At(i, j)
-				}
+				inputs.Row(input, i)
+				outputs.Row(output, i)
 				p.Predict(input, output)
-				for j, out := range output {
-					outputs.Set(i, j, out)
-				}
+				outputs.SetRow(i, output)
 			}
 		}
 	}
